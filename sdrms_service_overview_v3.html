@@ -1,0 +1,314 @@
+<div class="sdrms-overview">
+  <h2 class="sr-only">SDRMS 서비스 전체 구조 v3 — RTU 신규 등록 트리거 포함</h2>
+
+  <style>
+    .sdrms-overview {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Pretendard", "Noto Sans KR", sans-serif;
+      color: var(--text-100, #1a1a1a);
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 4px;
+      box-sizing: border-box;
+      --accent: #3b6ea8;
+      --accent-soft: #e3ecf6;
+      --muted: var(--text-300, #6b7280);
+      --line: var(--border-200, #d8dadc);
+      --card: var(--bg-100, #f7f7f7);
+      --card-strong: var(--bg-200, #ececec);
+    }
+    .sdrms-overview .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
+    .sdrms-overview section { margin: 28px 0; }
+    .sdrms-overview h3 { font-size: 15px; font-weight: 600; margin: 0 0 14px 0; color: var(--text-100); letter-spacing: -0.01em; }
+    .sdrms-overview h3 .num { display:inline-block; width:22px; height:22px; line-height:22px; text-align:center; background: var(--accent); color:#fff; border-radius:50%; font-size:12px; margin-right:8px; vertical-align:1px; }
+    .sdrms-overview .legend { font-size:11px; color: var(--muted); margin: 6px 0 0 30px; }
+
+    .roles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .role-card { border: 1px solid var(--line); border-radius: 8px; padding: 12px; background: var(--card); box-sizing: border-box; }
+    .role-card.admin { background: var(--accent-soft); border-color: var(--accent); }
+    .role-card .role-title { font-weight: 600; font-size: 13px; margin-bottom: 2px; }
+    .role-card .role-sub { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+    .role-card ul { font-size: 11.5px; padding-left: 16px; margin: 0; line-height: 1.6; }
+    .role-card .badge { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 8px; background: var(--accent); color: #fff; margin-top: 6px; }
+    .role-card .badge.alt { background: var(--card-strong); color: var(--text-100); }
+
+    .er-wrap { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 18px; }
+    .er-row { display: grid; grid-template-columns: 1fr 60px 1fr 60px 1fr; align-items: stretch; gap: 0; }
+    .er-box { border: 1.5px solid var(--accent); background: #fff; border-radius: 8px; padding: 10px 12px; text-align: center; }
+    .er-box .er-name { font-weight: 600; font-size: 13px; }
+    .er-box .er-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .er-box .er-attrs { font-size: 10.5px; color: var(--muted); margin-top: 6px; line-height: 1.5; text-align: left; }
+    .er-arrow { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+    .er-arrow .rel { font-size: 11px; color: var(--accent); font-weight: 600; }
+    .er-arrow .desc { font-size: 10px; color: var(--muted); }
+    .er-side { margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11.5px; color: var(--muted); }
+    .er-side div { padding: 8px 10px; background: #fff; border: 1px dashed var(--line); border-radius: 6px; line-height: 1.5; }
+    .er-side b { color: var(--text-100); font-weight: 600; }
+
+    .state-wrap { overflow-x: auto; padding-bottom: 8px; }
+    .state-map { min-width: 880px; }
+
+    /* Entry trigger (RTU 신규 등록) */
+    .entry-trigger {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .trigger-box {
+      width: 60%;
+      max-width: 520px;
+      border: 1.5px dashed var(--accent);
+      background: var(--accent-soft);
+      border-radius: 8px;
+      padding: 10px 14px;
+      text-align: center;
+      font-size: 12px;
+    }
+    .trigger-box .t-step {
+      display: inline-block;
+      font-size: 10px;
+      padding: 1px 6px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 8px;
+      margin-bottom: 6px;
+    }
+    .trigger-box .t-title { font-weight: 600; color: var(--text-100); }
+    .trigger-box .t-detail { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+    .trigger-box .t-detail b { color: var(--accent); font-weight: 600; }
+    .trigger-arrow { font-size: 18px; color: var(--accent); margin: 4px 0; line-height: 1; }
+    .trigger-arrow-label { font-size: 10.5px; color: var(--muted); margin-bottom: 2px; }
+
+    .state-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+    .state-row .s {
+      border: 1.5px solid var(--accent); background: #fff; border-radius: 6px;
+      padding: 10px 6px; text-align: center; font-size: 12px; font-weight: 600; color: var(--text-100);
+    }
+    .state-row .s .step { display: block; font-size: 10px; color: var(--muted); font-weight: 500; margin-bottom: 2px; }
+    .state-row .s.start { background: var(--accent-soft); }
+    .state-row .s.end { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .state-row .s.end .step { color: rgba(255,255,255,0.85); }
+    .arrow-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 0 calc((100% / 12) - 20px); margin: 6px 0; }
+    .arrow-row .a { text-align: center; font-size: 10.5px; color: var(--muted); line-height: 1.4; }
+    .arrow-row .a .who { font-weight: 600; color: var(--accent); display: block; }
+
+    .state-cancel {
+      margin-top: 12px; padding: 10px 12px; background: var(--card);
+      border-left: 3px solid var(--muted); border-radius: 4px;
+      font-size: 11.5px; color: var(--muted); line-height: 1.6;
+    }
+    .state-cancel b { color: var(--text-100); }
+
+    .access-table { width: 100%; border-collapse: collapse; font-size: 12px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+    .access-table th, .access-table td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    .access-table thead th { background: var(--card); font-weight: 600; font-size: 12px; }
+    .access-table tbody td:first-child { font-weight: 600; background: var(--card); }
+    .access-table .yes { color: var(--accent); font-weight: 600; }
+    .access-table .no { color: var(--muted); }
+    .access-table small { color: var(--muted); font-weight: 400; display: block; margin-top: 2px; line-height: 1.5; }
+
+    .policy-callout {
+      margin-top: 14px; padding: 10px 12px; background: var(--accent-soft);
+      border-left: 3px solid var(--accent); border-radius: 4px;
+      font-size: 11.5px; color: var(--text-100); line-height: 1.6;
+    }
+    .policy-callout b { color: var(--accent); }
+
+    @media (max-width: 720px) {
+      .roles { grid-template-columns: 1fr 1fr; }
+      .er-row { grid-template-columns: 1fr; }
+      .er-arrow { padding: 6px 0; flex-direction: row; }
+      .trigger-box { width: 92%; }
+    }
+  </style>
+
+  <!-- ========== Section 1: 역할 ========== -->
+  <section>
+    <h3><span class="num">1</span>사용자 역할 및 관계</h3>
+    <div class="roles">
+      <div class="role-card admin">
+        <div class="role-title">관리자</div>
+        <div class="role-sub">60hz 직원</div>
+        <ul>
+          <li>전체 RTU 모니터링·관리</li>
+          <li>프로젝트·사이트·계정 관리</li>
+          <li>개통완료 처리 (시공사 배정)</li>
+        </ul>
+        <span class="badge">마스터 권한</span>
+      </div>
+      <div class="role-card">
+        <div class="role-title">제조사</div>
+        <div class="role-sub">파트너사 (회사 또는 1인)</div>
+        <ul>
+          <li>RTU 신규 등록 (Firmware)</li>
+          <li>개통요청 · 출고완료 처리</li>
+          <li>(취소 권한 보유)</li>
+        </ul>
+        <span class="badge alt">파트너사</span>
+      </div>
+      <div class="role-card">
+        <div class="role-title">시공사</div>
+        <div class="role-sub">파트너사 (제조사와 동일 가능)</div>
+        <ul>
+          <li>설치기사 계정 관리</li>
+          <li>사이트 배정 · 출고취소</li>
+          <li>Admin에서 직접 설치완료 가능</li>
+        </ul>
+        <span class="badge alt">파트너사</span>
+      </div>
+      <div class="role-card">
+        <div class="role-title">설치기사</div>
+        <div class="role-sub">시공사 소속</div>
+        <ul>
+          <li>현장 RTU 설치완료 처리</li>
+          <li>설치사진·코멘트 등록</li>
+          <li>Mobile Web(QR) 전용</li>
+        </ul>
+        <span class="badge alt">시공사 종속</span>
+      </div>
+    </div>
+    <div class="legend">→ 제조사·시공사는 동일 회사일 수 있음. 설치기사는 시공사에 종속.</div>
+  </section>
+
+  <!-- ========== Section 2: 데이터 모델 ========== -->
+  <section>
+    <h3><span class="num">2</span>프로젝트 · 사이트 · RTU 관계</h3>
+    <div class="er-wrap">
+      <div class="er-row">
+        <div class="er-box">
+          <div class="er-name">프로젝트</div>
+          <div class="er-sub">Project</div>
+          <div class="er-attrs">프로젝트명<br/>시작/종료일<br/>진행 상태</div>
+        </div>
+        <div class="er-arrow">
+          <div class="rel">1 : N</div>
+          <svg width="56" height="20" viewBox="0 0 56 20"><line x1="0" y1="10" x2="50" y2="10" stroke="#3b6ea8" stroke-width="1.5"/><polygon points="50,5 56,10 50,15" fill="#3b6ea8"/></svg>
+          <div class="desc">사이트 매핑<br/>(선택)</div>
+        </div>
+        <div class="er-box">
+          <div class="er-name">사이트</div>
+          <div class="er-sub">Site (NEW)</div>
+          <div class="er-attrs">사이트명<br/>시공사 (필수)<br/>프로젝트 (선택)</div>
+        </div>
+        <div class="er-arrow">
+          <div class="rel">1 : N</div>
+          <svg width="56" height="20" viewBox="0 0 56 20"><line x1="0" y1="10" x2="50" y2="10" stroke="#3b6ea8" stroke-width="1.5"/><polygon points="50,5 56,10 50,15" fill="#3b6ea8"/></svg>
+          <div class="desc">설치완료 시<br/>사이트 결정</div>
+        </div>
+        <div class="er-box">
+          <div class="er-name">RTU</div>
+          <div class="er-sub">Device</div>
+          <div class="er-attrs">시리얼번호<br/>제조사·시공사·사이트<br/>설치기사·재고 상태</div>
+        </div>
+      </div>
+      <div class="er-side">
+        <div><b>핵심 변경:</b> RTU는 프로젝트가 아닌 <b>사이트</b>로 배정됨. 프로젝트 ↔ RTU는 사이트를 거쳐 간접 매핑.</div>
+        <div><b>시공사 배정:</b> 사이트에 시공사가 1:1 매핑되어, 그 시공사로 배정된 RTU만 해당 사이트에 설치 가능.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== Section 3: RTU 상태 프로세스 ========== -->
+  <section>
+    <h3><span class="num">3</span>RTU 상태 프로세스 (정상 흐름)</h3>
+    <div class="state-wrap">
+      <div class="state-map">
+
+        <!-- Entry trigger: RTU 신규 등록 -->
+        <div class="entry-trigger">
+          <div class="trigger-box">
+            <span class="t-step">0 · 신규 등록</span>
+            <div class="t-title">제조사 — RTU 하드웨어에 Firmware 등록</div>
+            <div class="t-detail">
+              RTU 생성 프로그램에서 펌웨어 입력 시 <b>RTU DB 신규 생성</b><br/>
+              → <b>제조사 = 펌웨어 등록 계정</b> 으로 자동 매핑
+            </div>
+          </div>
+          <div class="trigger-arrow-label" style="margin-top:8px">RTU 등록 → status = 생산완료</div>
+          <div class="trigger-arrow">▼</div>
+        </div>
+
+        <!-- 6 states -->
+        <div class="state-row">
+          <div class="s start"><span class="step">①</span>생산완료</div>
+          <div class="s"><span class="step">②</span>개통요청</div>
+          <div class="s"><span class="step">③</span>개통완료_<br/>시공사배정</div>
+          <div class="s"><span class="step">④</span>출고완료</div>
+          <div class="s"><span class="step">⑤</span>설치완료</div>
+          <div class="s end"><span class="step">⑥</span>설치완료_<br/>사진제출</div>
+        </div>
+
+        <svg width="100%" height="22" viewBox="0 0 880 22" preserveAspectRatio="none" style="margin-top:4px">
+          <g fill="#3b6ea8" stroke="#3b6ea8" stroke-width="1.4">
+            <line x1="73" y1="11" x2="143" y2="11" /><polygon points="143,7 150,11 143,15" stroke="none"/>
+            <line x1="220" y1="11" x2="290" y2="11" /><polygon points="290,7 297,11 290,15" stroke="none"/>
+            <line x1="367" y1="11" x2="437" y2="11" /><polygon points="437,7 444,11 437,15" stroke="none"/>
+            <line x1="513" y1="11" x2="583" y2="11" /><polygon points="583,7 590,11 583,15" stroke="none"/>
+            <line x1="660" y1="11" x2="730" y2="11" /><polygon points="730,7 737,11 730,15" stroke="none"/>
+          </g>
+        </svg>
+
+        <div class="arrow-row">
+          <div class="a"><span class="who">제조사</span>개통요청 처리</div>
+          <div class="a"><span class="who">관리자</span>개통완료 처리<br/>(시공사 배정)</div>
+          <div class="a"><span class="who">제조사</span>출고완료 처리<br/>(배송)</div>
+          <div class="a"><span class="who">시공사 / 설치기사</span>설치완료 처리<br/>(사이트 선택)</div>
+          <div class="a"><span class="who">시공사 / 설치기사</span>설치사진 등록<br/>(Admin·Mobile 필수)</div>
+        </div>
+
+        <div class="state-cancel">
+          <b>역방향 (취소 처리)</b> · 각 단계마다 이전 상태로 되돌리는 액션 존재 ·
+          ② → ① 제조사 개통요청 취소 ·
+          ③ → ② 제조사 개통완료 취소 ·
+          ④ → ③ 시공사 출고완료 취소 (사이트값 초기화, 시공사 유지) ·
+          ⑥ → ⑤ 시공사 사진제출 취소
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== Section 4: 접근 권한 ========== -->
+  <section>
+    <h3><span class="num">4</span>Admin · Mobile Web 접근 권한</h3>
+    <table class="access-table">
+      <thead>
+        <tr>
+          <th style="width:18%">역할</th>
+          <th style="width:41%">Admin (sdrms.60hz.co)</th>
+          <th style="width:41%">Mobile Web (QR 딥링크)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>관리자</td>
+          <td><span class="yes">전체 권한</span><small>모니터링·관리·개통완료 처리(시공사 배정)·계정/프로젝트/사이트 관리</small></td>
+          <td><span class="no">접근 없음</span></td>
+        </tr>
+        <tr>
+          <td>제조사</td>
+          <td><span class="yes">생산·개통·출고 단계</span><small>RTU 신규 등록(외부 프로그램), 개통요청·출고완료 처리, 자기 RTU 조회</small></td>
+          <td><span class="no">로그인 차단</span><small>로그인 시도 시 alert 노출</small></td>
+        </tr>
+        <tr>
+          <td>시공사</td>
+          <td><span class="yes">출고·설치·자료 단계</span><small>사이트 배정·출고완료 취소·설치완료 처리·설치사진 등록 (사진 필수)</small></td>
+          <td><span class="yes">QR로 RTU 상세 진입</span><small>배정된 RTU만 접근, 설치완료·설치사진 등록 (사진 필수)</small></td>
+        </tr>
+        <tr>
+          <td>설치기사</td>
+          <td><span class="no">접근 없음</span></td>
+          <td><span class="yes">현장 메인 채널</span><small>QR 촬영 → 설치완료 처리, 설치사진 등록 (사진 필수)</small></td>
+        </tr>
+        <tr>
+          <td>비회원</td>
+          <td><span class="no">로그인 필수</span></td>
+          <td><span class="no">접근 불가</span><small>QR 촬영 시 로그인 페이지로 직행</small></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="policy-callout">
+      <b>설치사진 정책:</b> Admin·Mobile Web 모두 <b>설치사진 등록 필수</b>로 통일.
+      코멘트(설치코멘트)는 두 채널 모두 <b>선택</b>. → ⑤ → ⑥ 전이 시 채널 구분 없이 동일한 입력 요구.
+    </div>
+  </section>
+</div>
